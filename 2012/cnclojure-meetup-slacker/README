@@ -1,0 +1,8 @@
+# cnclojure-meetup-slacker
+
+Slacker introduction on Clojure China Meetup, Beijing, 2012.3
+
+## Usage
+
+lein deps && lein run
+

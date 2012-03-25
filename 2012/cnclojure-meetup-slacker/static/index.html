@@ -1,0 +1,1125 @@
+<!doctype html>
+
+<!--
+    
+-->
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Clojure RPC framework, slacker</title>
+    
+    <link href="css/impress-demo.css" rel="stylesheet" />
+</head>
+<body>
+
+
+<div id="impress" class="impress-not-supported">
+
+    <div class="step slide title" data-x="-1000" data-y="-1500">
+      <h1>(meet slacker)</h1>
+      <p class="slogan">Transparent, non-invasive RPC by Clojure and for Clojure</p>
+    </div>
+
+    <div class="step slide" data-x="0" data-y="-1500">
+      <h2>(about me)</h2>
+      <p>:name "Sun Ning"</p>
+      <p>:github <a href="http://github.com/sunng87">sunng87</a></p>
+      <p>:twitter <a href="http://twitter.com/Sunng">@Sunng</a></p>
+    </div>
+
+    <div class="step slide" data-x="1000" data-y="-1500">
+      <h2>Agenda</h2>
+      <ul>
+        <li>RPC</li>
+        <li>Slacker Features</li>
+        <li>Slacker and Clojure World</li>
+        <li>The Future</li>
+      </ul>
+    </div>
+
+    <div class="step slide" data-x="-2000" data-y="-700"
+         data-rotate="90">
+      <h2>Your Application - 1</h2>
+      <div class="highlight"><pre><span class="p">(</span><span class="k">defn </span><span class="nv">login</span> <span class="p">[</span><span class="nv">req</span><span class="p">]</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[{</span><span class="nv">user</span> <span class="nv">:user</span> <span class="nv">passwd</span> <span class="nv">:passwd</span><span class="p">}</span> <span class="p">(</span><span class="nf">:params</span> <span class="nv">req</span><span class="p">)]</span>
+    <span class="p">(</span><span class="nf">look-up-user-db</span> <span class="nv">user</span> <span class="nv">passwd</span><span class="p">)))</span>  
+</pre></div>
+    </div>
+
+    <div class="step slide" data-x="-1000" data-y="-700"
+         data-rotate="90">
+      <h2>Your Application - 2</h2>
+      <div class="highlight"><pre><span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;foo</span><span class="o">.</span><span class="nv">users</span><span class="p">)</span>
+
+<span class="p">(</span><span class="k">defn </span><span class="nv">login</span> <span class="p">[</span><span class="nv">req</span><span class="p">]</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[{</span><span class="nv">user</span> <span class="nv">:user</span> <span class="nv">passwd</span> <span class="nv">:passwd</span><span class="p">}</span> <span class="p">(</span><span class="nf">:params</span> <span class="nv">req</span><span class="p">)]</span>
+    <span class="p">(</span><span class="nf">find-user</span> <span class="nv">user</span> <span class="nv">passwd</span><span class="p">)))</span>  
+</pre></div>
+    </div>
+
+    <div class="step slide" data-x="0" data-y="-700" data-rotate="90">
+      <h2>Your Application - 3</h2>
+      <div class="highlight"><pre><span class="p">(</span><span class="nf">require</span> <span class="o">&#39;</span><span class="p">[</span><span class="nv">foo</span><span class="o">.</span><span class="nv">users</span> <span class="nv">:as</span> <span class="nv">users</span><span class="p">])</span>
+<span class="p">(</span><span class="nf">require</span> <span class="o">&#39;</span><span class="p">[</span><span class="nv">foo</span><span class="o">.</span><span class="nv">search</span> <span class="nv">:as</span> <span class="nv">search</span><span class="p">])</span>
+<span class="p">(</span><span class="nf">require</span> <span class="o">&#39;</span><span class="p">[</span><span class="nv">foo</span><span class="o">.</span><span class="nv">cf</span> <span class="nv">:as</span> <span class="nv">cf</span><span class="p">])</span>
+
+<span class="p">(</span><span class="k">defn </span><span class="nv">login</span> <span class="p">[</span><span class="nv">req</span><span class="p">]</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[{</span><span class="nv">user</span> <span class="nv">:user</span> <span class="nv">passwd</span> <span class="nv">:passwd</span><span class="p">}</span> <span class="p">(</span><span class="nf">:params</span> <span class="nv">req</span><span class="p">)]</span>
+    <span class="p">(</span><span class="nf">users/find-user</span> <span class="nv">user</span> <span class="nv">passwd</span><span class="p">)))</span>  
+
+<span class="p">(</span><span class="k">def </span><span class="nv">search</span> <span class="p">[</span><span class="nv">req</span><span class="p">]</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[{</span><span class="nv">token</span> <span class="nv">:token</span> <span class="nv">options</span> <span class="nv">:options</span><span class="p">}</span> <span class="p">(</span><span class="nf">:params</span> <span class="nv">req</span><span class="p">)]</span>
+    <span class="p">(</span><span class="nf">search/search-for</span> <span class="nv">token</span> <span class="nv">options</span><span class="p">)))</span>
+
+<span class="p">(</span><span class="k">def </span><span class="nv">recommend</span> <span class="p">[</span><span class="nv">req</span><span class="p">]</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[{</span><span class="nv">user-id</span> <span class="nv">:user</span><span class="p">}</span> <span class="p">(</span><span class="nf">:session</span> <span class="nv">req</span><span class="p">)]</span>
+    <span class="p">(</span><span class="nf">cf/recommend-items</span> <span class="nv">user-id</span><span class="p">)))</span>
+</pre></div>
+    </div>
+
+    <div class="step slide" data-x="1000" data-y="-700"
+         data-rotate="90">
+      <svg>
+        <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985"
+       width="617.1579"
+       height="410"
+       x="10.000001"
+       y="10.933618"
+       rx="11.996897"
+       ry="2.3902836" />
+    <rect
+       style="fill:#80b3ff;fill-opacity:1;stroke:none"
+       id="rect2987"
+       width="582.85712"
+       height="145.44165"
+       x="24.293247"
+       y="83.790756"
+       rx="12.368001"
+       ry="1.917912" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Waree;-inkscape-font-specification:Waree"
+       x="168.10741"
+       y="168.36218"
+       id="text2989"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan2991"
+         x="168.10741"
+         y="168.36218">Web Controller</tspan></text>
+    <rect
+       style="fill:#9d93ac;fill-opacity:1;stroke:none"
+       id="rect2993"
+       width="171.42857"
+       height="155.71428"
+       x="27.142857"
+       y="240.93361"
+       rx="12.368001"
+       ry="2.4642229" />
+    <rect
+       style="fill:#9d93ac;fill-opacity:1;stroke:none"
+       id="rect2993-1"
+       width="171.42857"
+       height="155.71428"
+       x="231.42857"
+       y="241.64789"
+       rx="12.368001"
+       ry="2.4642229" />
+    <rect
+       style="fill:#9d93ac;fill-opacity:1;stroke:none"
+       id="rect2993-1-0"
+       width="171.42857"
+       height="155.71428"
+       x="435.71429"
+       y="241.6479"
+       rx="12.368001"
+       ry="2.4642229" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;"
+       x="42.857143"
+       y="330.93362"
+       id="text3031"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3033"
+         x="42.857143"
+         y="330.93362"
+         style="font-size:32px">Accounts</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;"
+       x="270"
+       y="330.93362"
+       id="text3035"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3037"
+         x="270"
+         y="330.93362"
+         style="font-size:32px">Search</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;"
+       x="503.86047"
+       y="328.57761"
+       id="text3035-6"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3037-5"
+         x="503.86047"
+         y="328.57761"
+         style="font-size:32px">CF</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;"
+       x="31.42857"
+       y="58.076469"
+       id="text3060"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3062"
+         x="31.42857"
+         y="58.076469">JVM</tspan></text>
+  </g>
+      </svg>
+    </div>
+
+    <div class="step slide" data-x="2000" data-y="-700"
+       data-rotate="90">
+      <h2> </h2>
+      <blockquote>If you cannot split, you cannot scale.</blockquote>
+      <svg>
+        <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985"
+       width="627.1579"
+       height="234.28572"
+       x="10.000001"
+       y="10.933618"
+       rx="12.191286"
+       ry="1.3658763" />
+    <rect
+       style="fill:#80b3ff;fill-opacity:1;stroke:none"
+       id="rect2987"
+       width="600"
+       height="145.44165"
+       x="24.293247"
+       y="83.790756"
+       rx="12.731766"
+       ry="1.917912" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;"
+       x="168.10741"
+       y="168.36218"
+       id="text2989"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan2991"
+         x="168.10741"
+         y="168.36218">Web Controller</tspan></text>
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985-5"
+       width="200.01505"
+       height="205.02216"
+       x="16.421053"
+       y="309.91144"
+       rx="3.8880808"
+       ry="1.1952709" />
+    <rect
+       style="fill:#9d93ac;fill-opacity:1;stroke:none"
+       id="rect2993"
+       width="171.42857"
+       height="137.02089"
+       x="31.428572"
+       y="367.92316"
+       rx="12.368001"
+       ry="2.1683946" />
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985-5-8"
+       width="200.01505"
+       height="203.59358"
+       x="227.13533"
+       y="309.93359"
+       rx="3.8880808"
+       ry="1.1869425" />
+    <rect
+       style="fill:#9d93ac;fill-opacity:1;stroke:none"
+       id="rect2993-1"
+       width="171.42857"
+       height="137.02089"
+       x="241.42857"
+       y="368.5517"
+       rx="12.368001"
+       ry="2.1683946" />
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985-5-8-3"
+       width="200.01505"
+       height="203.59358"
+       x="438.5639"
+       y="309.93356"
+       rx="3.8880808"
+       ry="1.1869425" />
+    <rect
+       style="fill:#9d93ac;fill-opacity:1;stroke:none"
+       id="rect2993-1-0"
+       width="171.42857"
+       height="137.02089"
+       x="451.42859"
+       y="367.29462"
+       rx="12.368001"
+       ry="2.1683946" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;"
+       x="46.775982"
+       y="443.62637"
+       id="text3031"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0078433,0.99221774)"><tspan
+         sodipodi:role="line"
+         id="tspan3033"
+         x="46.775982"
+         y="443.62637"
+         style="font-size:31.75096893px">Accounts</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;"
+       x="277.82098"
+       y="443.62634"
+       id="text3035"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0078433,0.99221774)"><tspan
+         sodipodi:role="line"
+         id="tspan3037"
+         x="277.82098"
+         y="443.62634"
+         style="font-size:31.75096893px">Search</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;"
+       x="515.53125"
+       y="439.87119"
+       id="text3035-6"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0078433,0.99221774)"><tspan
+         sodipodi:role="line"
+         id="tspan3037-5"
+         x="515.53125"
+         y="439.87119"
+         style="font-size:31.75096893px">CF</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:32px;"
+       x="31.42857"
+       y="58.076469"
+       id="text3060"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3062"
+         x="31.42857"
+         y="58.076469">JVM</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:32px;"
+       x="30.447824"
+       y="347.93835"
+       id="text3060-1"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3062-2"
+         x="30.447824"
+         y="347.93835">JVM</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:32px;"
+       x="241.16211"
+       y="346.5098"
+       id="text3060-1-8"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3062-2-9"
+         x="241.16211"
+         y="346.5098">JVM</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:32px;"
+       x="449.73352"
+       y="347.93835"
+       id="text3060-1-3"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3062-2-6"
+         x="449.73352"
+         y="347.93835">JVM</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="step slide" data-x="3000" data-y="-700" data-rotate="90">
+      <h2>Remoting</h2>
+      <ul>
+        <li>SOAP <span class="minor">(complex)</span></li>
+        <ul>
+          <li>Strong typing</li>
+          <li>Proxy generation</li>
+        </ul>
+        <li>RESTful <span class="minor">(easy, but not simple)</span></li>
+        <ul>
+          <li>Light weight</li>
+          <li>User friendly</li>
+        </ul>
+        <li>RPC <span class="minor">(simple)</span></li>
+        <ul>
+          <li>Fast and compact</li>
+          <li>Programming friendly</li>
+        </ul>
+      </ul>
+    </div>
+
+    <div class="step slide" data-x="4000" data-y="-700" data-rotate="90">
+      <h2>RPC Frameworks</h2>
+      <ul>
+        <li>Thrift</li>
+        <ul>
+          <li>Cassandra</li>
+          <li>Storm</li>
+        </ul>
+        <li>Avro</li>
+        <li>Protobuf(*)</li>
+      </ul>
+      <p>IDL + Code Generation</p>
+    </div>
+
+    <div class="step slide" data-x="5000" data-y="-700"
+         data-rotate="90">
+      <h2>Transparent RPC</h2>
+      <ul>
+        <li>Venus</li>
+        <ul>
+          <li>Cached Reflection</li>
+          <li>JSON/BSON serialization, asm</li>
+          <li>Client Proxy</li>
+        </ul>
+        <li>dRuby</li>
+        <ul>
+          <li>method_missing</li>
+        </ul>
+      </ul>
+    </div>
+
+    <div class="step slide" data-x="-1000" data-y="200">
+      <h2>In clojure, we have...</h2>
+      <ul>
+        <li>Dynamic language</li>
+        <li><strong>Functions</strong>: first-class objects</li>
+        <li><strong>Composite data structures</strong>: less user classes</li>
+        <li><strong>Macros</strong>: code that writes code</li>
+      </ul>
+    </div>
+
+    <div class="step slide" data-x="0" data-y="200">
+      <h2>Slacker</h2>
+      <p>Slacker is a non-invasive RPC framework designed for
+      clojure.</p>
+      <p>With slacker:</p>
+      <ul>
+        <li>You can deploy your modules on separated instances</li>
+        <li>No change required on your existed code</li>
+        <li>Your application won't be tied to third-party APIs</li>
+      </ul>
+    </div>
+
+    <div class="step slide" data-x="1000" data-y="200">
+      <h2>Server-side</h2>
+      <div class="highlight"><pre><span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;slacker</span><span class="o">.</span><span class="nv">server</span><span class="p">)</span>
+<span class="p">(</span><span class="nf">require</span> <span class="ss">&#39;foo</span><span class="o">.</span><span class="nv">users</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nf">start-slacker-server</span> <span class="p">[(</span><span class="nf">the-ns</span> <span class="ss">&#39;foo</span><span class="o">.</span><span class="nv">users</span><span class="p">)]</span> <span class="mi">2104</span><span class="p">)</span>
+</pre></div>
+      <p>This will expose all public functions under <code>'foo.users</code> on
+        port 2104.</p>
+    </div>
+
+    <div class="step slide" data-x="2000" data-y="200">
+      <h2>Client-side</h2>
+      <div class="highlight"><pre><span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;slacker</span><span class="o">.</span><span class="nv">client</span><span class="p">)</span>
+<span class="p">(</span><span class="k">def </span><span class="nv">sc</span> <span class="p">(</span><span class="nf">slackerc</span> <span class="s">&quot;10.60.1.2:2104&quot;</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nf">use-remote</span> <span class="ss">&#39;sc</span> <span class="ss">&#39;foo</span><span class="o">.</span><span class="nv">users</span><span class="p">)</span>
+
+<span class="p">(</span><span class="k">defn </span><span class="nv">login</span> <span class="p">[</span><span class="nv">req</span><span class="p">]</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[{</span><span class="nv">user</span> <span class="nv">:user</span> <span class="nv">passwd</span> <span class="nv">:passwd</span><span class="p">}</span> <span class="p">(</span><span class="nf">:params</span> <span class="nv">req</span><span class="p">)]</span>
+    <span class="p">(</span><span class="nf">find-user</span> <span class="nv">user</span> <span class="nv">passwd</span><span class="p">)))</span>
+</pre></div>
+      <p>Create a slacker connection to 10.60.1.2:2104. Import all
+      functions of <code>foo.users</code> to current namespace (<code>use-remote</code>), just
+      like calling <code>use</code> locally.</p>
+    </div>
+
+    <div class="step slide" data-x="0" data-y="1100">
+      <h2>Slacker Features</h2>
+      <ul>
+        <li>Async, callback</li>
+        <li>Connection Pooling</li>
+        <li>Multiple serialization formats</li>
+        <li>HTTP transport</li>
+        <li>Server Interceptor</li>
+        <li>Cluster</li>
+      </ul>
+    </div>
+
+    <div class="step slide" data-x="1000" data-y="1100">
+      <h2>Async and callback</h2>
+      <p>Customizable behavior of client proxy</p>
+      <div class="highlight"><pre><span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;slacker</span><span class="o">.</span><span class="nv">client</span><span class="p">)</span>
+
+<span class="p">(</span><span class="k">def </span><span class="nv">sc</span> <span class="p">(</span><span class="nf">slackerc</span> <span class="s">&quot;10.60.1.2:2104&quot;</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nf">defn-remote</span> <span class="nv">sc</span> <span class="nv">timestamp</span> <span class="nv">:async</span> <span class="nv">true</span><span class="p">)</span>
+<span class="nv">@</span><span class="p">(</span><span class="nf">timestamp</span><span class="p">)</span>
+<span class="c1">;; (deref (timestamp) timeout)</span>
+
+<span class="p">(</span><span class="nf">defn-remote</span> <span class="nv">sc</span> <span class="nv">timestamp</span> <span class="nv">:callback</span> <span class="o">#</span><span class="p">(</span><span class="nv">prn</span> <span class="nv">%</span><span class="p">))</span>
+<span class="p">(</span><span class="nf">timestamp</span><span class="p">)</span>
+</pre></div>
+    </div>
+
+    <div class="step slide" data-x="2000" data-y="1100">
+      <h2>Connection Pooling</h2>
+      <p>Resizable aleph connection pool based on commons-pool.</p>
+      <div class="highlight"><pre><span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;slacker</span><span class="o">.</span><span class="nv">client</span><span class="p">)</span>
+<span class="p">(</span><span class="k">def </span><span class="nv">sc</span> <span class="p">(</span><span class="nf">slackerc-pool</span> <span class="s">&quot;10.60.1.2:2104&quot;</span>
+                       <span class="nv">:exhausted-action</span> <span class="nv">:grow</span>
+                       <span class="nv">:max-idle</span> <span class="mi">12</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nf">use-remote</span> <span class="ss">&#39;sc</span> <span class="ss">&#39;foo</span><span class="o">.</span><span class="nv">users</span><span class="p">)</span>
+</pre></div>
+    </div>
+
+    <div class="step slide" data-x="3000" data-y="1100">
+      <h2>Customizable serialization</h2>
+      <p>By default, slacker uses carbonite(kryo) for
+        serialization. But you can also configure text based formats like <code>:json</code>
+        and <code>:clj</code>. In slacker 0.7, content compression is
+        supported.</p>
+
+      <div class="highlight"><pre><span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;slacker</span><span class="o">.</span><span class="nv">client</span><span class="p">)</span>
+<span class="p">(</span><span class="k">def </span><span class="nv">sc</span> <span class="p">(</span><span class="nf">slackerc</span> <span class="s">&quot;10.60.1.2:2104&quot;</span>
+                  <span class="nv">:content-type</span> <span class="nv">:json</span><span class="p">))</span>
+<span class="p">(</span><span class="k">def </span><span class="nv">sc2</span> <span class="p">(</span><span class="nf">slackerc</span> <span class="s">&quot;10.60.1.2:2104&quot;</span>
+                   <span class="nv">:content-type</span> <span class="nv">:deflate-carb</span><span class="p">))</span>
+</pre></div>
+    </div>
+
+    <div class="step slide" data-x="4000" data-y="1100">
+      <h2>HTTP Transport</h2>
+      <p>Expose a HTTP port for debugging and test.</p>
+      <div class="highlight"><pre><span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;slacker</span><span class="o">.</span><span class="nv">server</span><span class="p">)</span>
+<span class="p">(</span><span class="nf">start-slacker-server</span> <span class="p">[(</span><span class="nf">the-ns</span> <span class="ss">&#39;foo</span><span class="o">.</span><span class="nv">users</span><span class="p">)]</span>
+                      <span class="mi">2104</span>
+                      <span class="nv">:http</span> <span class="mi">8080</span><span class="p">)</span>
+</pre></div>
+      <div><code>curl -d "[\"user\" \"passwd\"]" http://10.60.1.2:8080/foo.users/find-users.clj</code></div>
+    </div>
+
+    <div class="step slide" data-x="5000" data-y="1100">
+      <h2>Server interceptors</h2>
+      <div class="highlight"><pre><span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;slacker</span><span class="o">.</span><span class="nv">server</span><span class="p">)</span>
+<span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;slacker</span><span class="o">.</span><span class="nv">interceptor</span><span class="p">)</span>
+<span class="p">(</span><span class="nf">use</span> <span class="o">&#39;</span><span class="p">[</span><span class="nv">slacker</span><span class="o">.</span><span class="nv">interceptors</span><span class="o">.</span><span class="nv">stats</span> <span class="nv">:only</span> <span class="p">[</span><span class="nv">function-call-stats</span><span class="p">]])</span>
+<span class="p">(</span><span class="nf">use</span> <span class="o">&#39;</span><span class="p">[</span><span class="nv">slacker</span><span class="o">.</span><span class="nv">interceptors</span><span class="o">.</span><span class="nv">slowwatchdog</span> <span class="nv">:only</span> <span class="p">[</span><span class="nv">slow-watch-dog</span><span class="p">]])</span>
+
+<span class="p">(</span><span class="nf">start-slacker-server</span> <span class="p">[(</span><span class="nf">the-ns</span> <span class="ss">&#39;foo</span><span class="o">.</span><span class="nv">users</span><span class="p">)]</span> <span class="mi">2104</span>
+                      <span class="nv">:interceptors</span> <span class="p">(</span><span class="nf">interceptors</span> <span class="nv">function-call-stats</span>
+                                                  <span class="p">(</span><span class="nf">slow-watch-dog</span> <span class="mi">5000</span><span class="p">)))</span>
+</pre></div>
+    </div>
+    
+    <div class="step slide" data-x="6000" data-y="1100">
+      <h2>Call stats</h2>
+      <p>The call-stats interceptor exposes data via JMX.</p>
+      <p><img src="call-stats.png" alt="jmx interface" /></p>
+    </div>
+
+    <div class="step slide" data-x="7000" data-y="1100">
+      <h2>Slow watch dog</h2>
+      <p>Log slow calls and arguments.</p>
+      <p><img src="slow-watch-dog.png" alt="slow watch dog" /></p>
+    </div>
+
+    <div class="step slide" data-x="8000" data-y="1100">
+      <h2>Create your own interceptor</h2>
+      <p>Extending slacker server by adding your own interceptor.</p>
+      <div class="highlight"><pre><span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;slacker</span><span class="o">.</span><span class="nv">interceptor</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nf">definterceptor</span> <span class="nv">logger</span>
+  <span class="nv">:before</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">req</span><span class="p">]</span>
+            <span class="p">(</span><span class="nb">println </span><span class="p">(</span><span class="nb">str </span><span class="s">&quot;calling: &quot;</span> <span class="p">(</span><span class="nf">:fname</span> <span class="nv">req</span><span class="p">)))</span>
+            <span class="nv">req</span><span class="p">))</span>
+</pre></div>
+      <p><a href="https://github.com/sunng87/slacker/wiki/Interceptors">*
+      More on interceptor framework.</a></p>
+    </div>
+
+    <div class="step slide" data-x="-1000" data-y="2000" data-rotate="-90">
+      <h2>Slacker Cluster</h2>
+      <p>Slacker cluster uses zookeeper as centralized registry. All
+      servers and namespaces are registered in zookeeper. Clients read
+      cluster information from zookeeper and establish connection to
+      servers interested.</p>
+      <p>Also, clients are notified when connected server goes offline,
+      or new server goes online, which provides certain
+      namespaces. This enables high-availability of
+      slacker services.</p>
+    </div>
+
+    <div class="step slide" data-x="0" data-y="2000" data-rotate="-90">
+      <h2>Slacker Cluster</h2>
+      <svg>
+        <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985"
+       width="250.01505"
+       height="93.397461"
+       x="15.714287"
+       y="25.219332"
+       rx="4.8600278"
+       ry="0.54450345" />
+    <rect
+       style="fill:#80b3ff;fill-opacity:1;stroke:none"
+       id="rect2987"
+       width="239.18861"
+       height="57.979977"
+       x="21.412256"
+       y="54.26366"
+       rx="5.075489"
+       ry="0.76457119" />
+    <text
+       xml:space="preserve"
+       style="font-size:15.94590759px;line-height:125%"
+       x="78.743439"
+       y="87.977859"
+       id="text2989"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan2991"
+         x="78.743439"
+         y="87.977859">Web Controller</tspan></text>
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985-5"
+       width="103.85096"
+       height="106.45073"
+       x="12.135339"
+       y="179.91144"
+       rx="2.0187528"
+       ry="0.62060344" />
+    <rect
+       style="fill:#9d93ac;fill-opacity:1;stroke:none"
+       id="rect2993"
+       width="89.008408"
+       height="71.143402"
+       x="19.927477"
+       y="210.03204"
+       rx="6.4216604"
+       ry="1.1258645" />
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985-5-8"
+       width="110.1935"
+       height="112.16501"
+       x="222.84961"
+       y="179.93359"
+       rx="2.142045"
+       ry="0.65391755" />
+    <rect
+       style="fill:#9d93ac;fill-opacity:1;stroke:none"
+       id="rect2993-1"
+       width="94.444466"
+       height="75.48838"
+       x="230.72414"
+       y="212.22784"
+       rx="6.8138542"
+       ry="1.1946251" />
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985-5-8-3"
+       width="113.00043"
+       height="115.02216"
+       x="422.2782"
+       y="179.93356"
+       rx="2.1966088"
+       ry="0.67057455" />
+    <rect
+       style="fill:#9d93ac;fill-opacity:1;stroke:none"
+       id="rect2993-1-0"
+       width="96.85022"
+       height="77.41127"
+       x="429.54623"
+       y="212.34024"
+       rx="6.987421"
+       ry="1.2250553" />
+    <text
+       xml:space="preserve"
+       style="font-size:20.76862907px;line-height:125%"
+       x="27.868008"
+       y="249.48737"
+       id="text3031"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0078433,0.99221774)"><tspan
+         sodipodi:role="line"
+         id="tspan3033"
+         x="27.868008"
+         y="249.48737"
+         style="font-size:16.48560143px">Accounts</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:22.03704262px;line-height:125%"
+       x="250.01321"
+       y="253.66043"
+       id="text3035"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0078433,0.99221774)"><tspan
+         sodipodi:role="line"
+         id="tspan3037"
+         x="250.01321"
+         y="253.66043"
+         style="font-size:17.49243546px">Search</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:22.59838486px;line-height:125%"
+       x="464.40359"
+       y="253.38098"
+       id="text3035-6"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0078433,0.99221774)"><tspan
+         sodipodi:role="line"
+         id="tspan3037-5"
+         x="464.40359"
+         y="253.38098"
+         style="font-size:17.93801498px">CF</tspan></text>
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985-4"
+       width="250.01505"
+       height="93.397461"
+       x="286.42105"
+       y="25.663452"
+       rx="4.8600278"
+       ry="0.54450345" />
+    <rect
+       style="fill:#80b3ff;fill-opacity:1;stroke:none"
+       id="rect2987-5"
+       width="239.18861"
+       height="57.979977"
+       x="292.11902"
+       y="54.707783"
+       rx="5.075489"
+       ry="0.76457119" />
+    <text
+       xml:space="preserve"
+       style="font-size:15.94590759px;line-height:125%"
+       x="349.4502"
+       y="88.421982"
+       id="text2989-0"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan2991-3"
+         x="349.4502"
+         y="88.421982">Web Controller</tspan></text>
+    <rect
+       style="fill:#ffccaa;fill-opacity:1;stroke:none"
+       id="rect3108"
+       width="125.71429"
+       height="88.571426"
+       x="600"
+       y="119.50504"
+       rx="2.1966088"
+       ry="0.67057455" />
+    <text
+       xml:space="preserve"
+       style="font-size:22.59838486px;line-height:125%"
+       x="612.26697"
+       y="171.6051"
+       id="text3035-6-5"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0078433,0.99221774)"><tspan
+         sodipodi:role="line"
+         id="tspan3037-5-5"
+         x="612.26697"
+         y="171.6051"
+         style="font-size:17.93801498px">Zookeeper</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="step slide" data-x="1000" data-y="2000"
+       data-rotate="-90">
+      <h2>Slacker Cluster</h2>
+      <p>You don't have to change client configuration for adding a
+      new instance of search function.</p>
+      <svg>
+        <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985"
+       width="250.01505"
+       height="93.397461"
+       x="15.714287"
+       y="25.219332"
+       rx="4.8600278"
+       ry="0.54450345" />
+    <rect
+       style="fill:#80b3ff;fill-opacity:1;stroke:none"
+       id="rect2987"
+       width="239.18861"
+       height="57.979977"
+       x="21.412256"
+       y="54.26366"
+       rx="5.075489"
+       ry="0.76457119" />
+    <text
+       xml:space="preserve"
+       style="font-size:15.94590759px;line-height:125%"
+       x="78.743439"
+       y="87.977859"
+       id="text2989"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan2991"
+         x="78.743439"
+         y="87.977859">Web Controller</tspan></text>
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985-5"
+       width="103.85096"
+       height="106.45073"
+       x="12.135339"
+       y="179.91144"
+       rx="2.0187528"
+       ry="0.62060344" />
+    <rect
+       style="fill:#9d93ac;fill-opacity:1;stroke:none"
+       id="rect2993"
+       width="89.008408"
+       height="71.143402"
+       x="19.927477"
+       y="210.03204"
+       rx="6.4216604"
+       ry="1.1258645" />
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985-5-8"
+       width="110.1935"
+       height="112.16501"
+       x="166.84961"
+       y="179.93359"
+       rx="2.142045"
+       ry="0.65391755" />
+    <rect
+       style="fill:#9d93ac;fill-opacity:1;stroke:none"
+       id="rect2993-1"
+       width="94.444466"
+       height="75.48838"
+       x="174.72414"
+       y="212.22784"
+       rx="6.8138542"
+       ry="1.1946251" />
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985-5-8-3"
+       width="113.00043"
+       height="115.02216"
+       x="422.2782"
+       y="179.93356"
+       rx="2.1966088"
+       ry="0.67057455" />
+    <rect
+       style="fill:#9d93ac;fill-opacity:1;stroke:none"
+       id="rect2993-1-0"
+       width="96.85022"
+       height="77.41127"
+       x="429.54623"
+       y="212.34024"
+       rx="6.987421"
+       ry="1.2250553" />
+    <text
+       xml:space="preserve"
+       style="font-size:20.76862907px;line-height:125%"
+       x="27.868008"
+       y="249.48737"
+       id="text3031"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0078433,0.99221774)"><tspan
+         sodipodi:role="line"
+         id="tspan3033"
+         x="27.868008"
+         y="249.48737"
+         style="font-size:16.48560143px">Accounts</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:22.03704262px;line-height:125%"
+       x="194.44901"
+       y="253.66043"
+       id="text3035"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0078433,0.99221774)"><tspan
+         sodipodi:role="line"
+         id="tspan3037"
+         x="194.44901"
+         y="253.66043"
+         style="font-size:17.49243546px">Search</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:22.59838486px;line-height:125%"
+       x="464.40359"
+       y="253.38098"
+       id="text3035-6"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0078433,0.99221774)"><tspan
+         sodipodi:role="line"
+         id="tspan3037-5"
+         x="464.40359"
+         y="253.38098"
+         style="font-size:17.93801498px">CF</tspan></text>
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985-4"
+       width="250.01505"
+       height="93.397461"
+       x="286.42105"
+       y="25.663452"
+       rx="4.8600278"
+       ry="0.54450345" />
+    <rect
+       style="fill:#80b3ff;fill-opacity:1;stroke:none"
+       id="rect2987-5"
+       width="239.18861"
+       height="57.979977"
+       x="292.11902"
+       y="54.707783"
+       rx="5.075489"
+       ry="0.76457119" />
+    <text
+       xml:space="preserve"
+       style="font-size:15.94590759px;line-height:125%"
+       x="349.4502"
+       y="88.421982"
+       id="text2989-0"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan2991-3"
+         x="349.4502"
+         y="88.421982">Web Controller</tspan></text>
+    <rect
+       style="fill:#ffccaa;fill-opacity:1;stroke:none"
+       id="rect3108"
+       width="125.71429"
+       height="88.571426"
+       x="600"
+       y="119.50504"
+       rx="2.1966088"
+       ry="0.67057455" />
+    <text
+       xml:space="preserve"
+       style="font-size:22.59838486px;line-height:125%"
+       x="612.26697"
+       y="171.6051"
+       id="text3035-6-5"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0078433,0.99221774)"><tspan
+         sodipodi:role="line"
+         id="tspan3037-5-5"
+         x="612.26697"
+         y="171.6051"
+         style="font-size:17.93801498px">Zookeeper</tspan></text>
+    <rect
+       style="fill:#cdde87;fill-opacity:1;stroke:none"
+       id="rect2985-5-8-0"
+       width="110.1935"
+       height="112.16501"
+       x="284.90323"
+       y="178.85109"
+       rx="2.142045"
+       ry="0.65391755" />
+    <rect
+       style="fill:#9d93ac;fill-opacity:1;stroke:none"
+       id="rect2993-1-7"
+       width="94.444466"
+       height="75.48838"
+       x="292.77777"
+       y="211.14534"
+       rx="6.8138542"
+       ry="1.1946251" />
+    <text
+       xml:space="preserve"
+       style="font-size:22.03704262px;line-height:125%"
+       x="311.58392"
+       y="252.56946"
+       id="text3035-8"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0078433,0.99221774)"><tspan
+         sodipodi:role="line"
+         id="tspan3037-6"
+         x="311.58392"
+         y="252.56946"
+         style="font-size:17.49243546px">Search</tspan></text>
+        </g>
+      </svg>
+      
+    </div>
+
+    <div class="step slide" data-x="2000" data-y="2000"
+       data-rotate="-90">
+      <h2>Slacker cluster</h2>
+      <p>Register server to cluster</p>
+      <div class="highlight"><pre><span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;slacker</span><span class="o">.</span><span class="nv">server</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nf">start-slacker-server</span> <span class="p">[(</span><span class="nf">the-ns</span> <span class="ss">&#39;foo</span><span class="o">.</span><span class="nv">users</span><span class="p">)]</span> <span class="mi">2104</span>
+                      <span class="nv">:cluster</span> <span class="p">{</span><span class="nv">:zk</span> <span class="s">&quot;10.60.1.254:2181&quot;</span>
+                                <span class="nv">:name</span> <span class="s">&quot;foo-cluster&quot;</span><span class="p">})</span>
+</pre></div>
+    </div>
+
+    <div class="step slide" data-x="3000" data-y="2000"
+         data-rotate="-90">
+      <h2>Slacker cluster</h2>
+      <p>Configure slacker client for cluster.</p>
+      <div class="highlight"><pre><span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;slacker</span><span class="o">.</span><span class="nv">client</span><span class="o">.</span><span class="nv">cluster</span><span class="p">)</span>
+
+<span class="p">(</span><span class="k">def </span><span class="nv">sc</span> <span class="p">(</span><span class="nf">clustered-slackerc</span> <span class="s">&quot;foo-cluster&quot;</span>
+                            <span class="s">&quot;10.60.1.254:2181&quot;</span><span class="p">))</span>
+
+<span class="p">(</span><span class="nf">use-remote</span> <span class="ss">&#39;sc</span> <span class="ss">&#39;foo</span><span class="o">.</span><span class="nv">users</span><span class="p">)</span>
+</pre></div>
+    </div>
+
+    <div class="step slide" data-x="-1000" data-y="2900">
+      <h2>Slacker And Clojure World</h2>
+      <ul>
+        <li>aleph</li>
+        <li>lamina</li>
+        <li>gloss</li>
+        <li>slingshot</li>
+        <li>carbonite</li>
+      </ul>
+    </div>
+
+    <div class="step slide" data-x="0" data-y="2900">
+      <h2>Aleph</h2>
+      <p>Aleph is a Clojure framework for asynchronous communication,
+      built on top of Netty and Lamina. </p>
+      <ul>
+        <li>TCP, UDP</li>
+        <li>HTTP, WebSocket</li>
+        <li>redis</li>
+      </ul>
+    </div>
+
+    <div class="step slide" data-x="1000" data-y="2900">
+      <h2>Lamina</h2>
+      <p>Lamina provides an event-driven analogue to Clojure’s
+      sequences, called channels. Similar mechanisms have been used in
+      languages such as Go, JoCaml, and C#.</p>
+      <p><a href="http://www.infoq.com/presentations/Event-Driven-Programming-in-Clojure">
+          Zach Tellman: Event-Driven Programming in Clojure</a></p>
+    </div>
+
+    <div class="step slide" data-x="2000" data-y="2900">
+      <h2>Gloss</h2>
+      <p>Gloss is a byte-format DSL. It can turn complicated byte
+      formats into Clojure data structures, allowing for easy use of
+      custom network protocols and C libraries. </p>
+      <p><a href="https://github.com/sunng87/slacker/blob/master/src/slacker/protocol.clj">Slacker
+      protocol defined in gloss.</a></p>
+      
+    </div>
+
+    <div class="step slide" data-x="3000" data-y="2900">
+      <h2>Slingshot</h2>
+      <p>Provides <code>try+</code> and <code>throw+</code>. Each is
+      100% compatible with
+      Clojure and Java's native try and throw both in source code and
+      at runtime. Each also provides new capabilities intended to
+      improve ease of use by leveraging Clojure's features like maps,
+      records, and destructuring.</p>
+      <ul>
+        <li>Custom exception data.</li>
+        <li>No need to create your own exception class.</li>
+        <li>No AOT required.</li>
+      </ul>
+    </div>
+
+    <div class="step slide" data-x="4000" data-y="2900">
+      <h2>carbonite</h2>
+      <p>Clojure wrapper of the fast Java serialization library:
+      Kryo. Carbonite also provides built-in serializers for clojure
+      native types.</p>
+
+    </div>
+
+    <div class="step slide" data-x="-1000" data-y="3800"
+      data-rotate="180">
+      <h2>The Future</h2>
+      <ul>
+        <li>Interoperability</li>
+        <ul>
+          <li>clojurescript / nodejs</li>
+          <li>ruby-clj</li>
+          <li>pyclj</li>
+        </ul>
+        <li>Distribute STM</li>
+        <li>More FP Features</li>
+        <ul>
+          <li>High order functions</li>
+          <li>Lazy sequence</li>
+        </ul>
+      </ul>
+    </div>
+
+    <div class="step slide" data-x="0" data-y="3800" data-z="100
+"
+         data-rotate-x="190" data-rotate-y="-20">
+      <h1>(thank! you)</h1>
+      <p><a href="http://github.com/sunng87/slacker">http://github.com/sunng87/slacker</a></p>
+      <p><a href="http://sunng.info/">http://sunng.info</a></p>
+    </div>
+  
+    <div id="overview" class="step" data-x="3300" data-y="1200"
+         data-scale="9">
+      
+    </div>
+
+</div>
+
+
+<script src="js/impress.js"></script>
+
+</body>
+</html>
+
+
+

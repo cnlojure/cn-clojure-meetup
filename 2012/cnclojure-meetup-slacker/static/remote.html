@@ -1,0 +1,31 @@
+<html>
+<head>
+  <title>Slides Controller</title>
+
+  <script type="text/javascript">
+    if (window.MozWebSocket) {window.WebSocket = window.MozWebSocket;}
+    var ws = new WebSocket("ws://"+document.location.host+"/control");
+    ws.onopen = function() {ws.send("control#")}
+    
+    function prev() {ws.send("prev");}
+    function next() {ws.send("next");}
+  </script>
+
+  <style type="text/css">
+    *{margin:0; padding:0;}
+    #panel {padding:5px; background:#EEE;}
+    div.button {margin:5em; height:30em;}
+    div.button button {display:block; width:100%; 
+    font-size:5em; height:100%; border:1px #333 solid;
+    background:#999; color:#FFF;}
+  </style>
+</head>
+
+
+<body>
+  <div id="panel">
+    <div class="button"><button onclick="prev();">&lt;</button></div>
+    <div class="button"><button onclick="next();">&gt;</button></div>
+  </div>
+</body>
+</html>

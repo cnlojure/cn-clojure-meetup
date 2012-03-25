@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+<!--
+
+  Created using /
+  Source can be edited via /oxohev/7/edit
+
+-->
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<title>Seesaw Introduction</title>
+<link href='http://fonts.googleapis.com/css?family=Anton' rel='stylesheet' type='text/css'/>
+<style>
+  h1, header { font-family: 'anton' }
+  body { font-family: sans-serif; background: #000; }
+  pre { border: 3px solid #666;
+        background: #222;
+        font-family: menlo, monospace;
+        font-size: 16px;
+        border-radius: 5px;
+        padding: 15px;
+        overflow: hidden;
+        text-overflow: ellipsis; }
+  a { font-weight: bold; color: #eb446b; }
+  .slide {
+background-color:#242424;
+background-image: -moz-radial-gradient(50% 50%, ellipse closest-side, #242424 0%,#000000 100%);
+background-image: -webkit-radial-gradient(50% 50%, ellipse closest-side, #242424 0%,#000000 100%);
+background-image: -o-radial-gradient(50% 50%, ellipse closest-side, #242424 0%,#000000 100%);
+background-image: -ms-radial-gradient(50% 50%, ellipse closest-side, #242424 0%,#000000 100%);
+background-image: radial-gradient(50% 50%, ellipse closest-side, #242424 0%,#000000 100%);
+
+      border: 5px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+  }
+
+  p, li {
+    color: #fff;
+  }
+
+  li li {
+     font-size: 20px;
+     margin: 20px 40px;
+  }
+
+  h1, header {
+    color: #f8e064;
+  }
+
+  span {
+    color: #eb446b;
+  }
+
+  small {
+    font-size: 15px;
+  }
+
+  h3 {
+  font-size: 40px;
+  }
+
+        body {
+        color: #00ff00;
+        background-color: #1f1f1f;
+      }
+
+      .builtin {
+        /* font-lock-builtin-face */
+        color: #b0c4de;
+      }
+      .constant {
+        /* font-lock-constant-face */
+        color: #7fffd4;
+      }
+      .esk-paren {
+        /* esk-paren-face */
+        color: #7f7f7f;
+      }
+      .hl-line {
+        /* hl-line */
+        background-color: #556b2f;
+      }
+      .preprocessor {
+        /* font-lock-preprocessor-face */
+        color: #b0c4de;
+      }
+      .type {
+        /* font-lock-type-face */
+        color: #98fb98;
+      }
+      .variable-name {
+        /* font-lock-variable-name-face */
+        color: #eedd82;
+      }
+
+      a {
+        color: inherit;
+        background-color: inherit;
+        font: inherit;
+        text-decoration: inherit;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+</style>
+<!--
+<link href="http://remysharp.com/demo/present.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="https://raw.github.com/remy/present/master/present.js"></script>
+-->
+<link href="present.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="present.js"></script>
+</head>
+<body class="scroll">
+
+<div class="slide current">
+  <h1>Introduction to Seesaw </h1>
+</div>
+
+<div class="slide">
+  <header>About me</header>
+  <ul>
+      <li>xiaonaitong/tony</li>
+      <li>Interested in functional programming, Web, Emacs &
+      Visualization recently</li>
+      <li>Mail: xiaonaitong@gmail.com</li>
+      <li>Blogger: <a href="http://xiaonaiotng.github.com">xiaonaiotng.github.com</a> </li>
+      <li>Github: <a href="http://github.com/xiaonaitong">github.com/xiaonaitong</a></li>
+  </ul>
+</div>
+
+<div class="slide">
+  <header>Contents </header>
+  <ul class="reveal">
+      <li>A simple example to get Started</li>
+      <li>Features tour</li>
+      <li>Tips</li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h1>What is Seesaw?</h1>
+</div>
+
+<div class="slide">
+<p>
+    A Swing DSL for Clojure
+</p>
+
+<ul>
+    <li>Clojure + UI</li>
+    <li>Authored by Dave Ray</li>
+    <li>Built on Swing</li>
+</ul>
+
+</div>
+
+<div class="slide">
+ <header>Demo project </header>
+<ul>
+    <li>learn by doing</li>
+    <li>follow Dave Ray's great repl <a href="https://gist.github.com/1441520">tuitor</a></li>
+    <li>have fun</li>
+</ul>
+<pre>
+    |=================================|
+    |- dir      | file                |
+    | -         | file2               |
+    |  +        | file3               |
+    | - subdir  |                     |
+    |==================================
+</pre>
+</div>
+
+<div class="slide">
+  <header>Preparation</header>
+<p>
+  add seesaw to your project.clj
+</p>
+<pre>
+  [seesaw "1.3.1-SNAPSHOT"]
+</pre>
+
+<p>
+start a repl
+</p>
+<pre>
+user>(use 'seesaw.core)
+</pre>
+</div>
+
+<div class="slide">
+<p>
+  seesaw.dev have some very useful functions for development,
+  especially debug!, highly recommended.
+</p>
+<pre>
+user>(use 'seesaw.dev)
+user>(debug!)
+</pre>
+
+<p>
+  first create the main frame
+</p>
+<pre>
+user>(def browser (frame :title "File browser"))
+user>(show! browser)
+</pre>
+</div>
+
+<div class="slide">
+  <p>
+  The frame has no content, only border.<br/>
+  We can set the size by
+  </p>
+<pre>
+user>(config! browser :size [600 :by 600]
+</pre>
+
+<p>
+show!, config! by clojure idiom, have side effect.
+Here, they'll change state of widget.
+</p>
+
+</div>
+
+<div class="slide">
+  <header>Widget</header>
+  <ul>
+    <li>widget is  ordinary swing component</li>
+    <li>dsl for widget construction, like hiccup</li>
+    <li>seesaw.dev/show-options get configurable option </li>
+    <li>Container widegets</li>
+  </ul>
+</div>
+
+<div class="slide">
+  <p>
+    Let's add some content.<br/>
+    In the draft, there is left and right two part, we need use
+    widget like JSplitPane.<br/>
+  </p>
+<pre>
+user>(config! browser :content
+               (left-right-split (tree) (listbox)))
+</pre>
+
+<p>
+  Seesaw use css style selector to conveniently fetch widget.<br/>
+  To do so  assigned an id to the widget
+</p>
+<pre>
+user>(use 'seesaw.tree)
+user>(config! browser :content
+               (left-right-split (tree :id :dirs)
+                                 (listbox :id :files)))
+</pre>
+</div>
+
+<div class="slide">
+  <header>Useful functions </header>
+
+  <ul>
+      <li>config/config!</li>
+      <li>select</li>
+      <li>show!</li>
+      <li>listen</li>
+      <li>selection</li>
+      <li>show-options/show-events</li>
+  </ul>
+</div>
+
+<div class="slide">
+<header>Directory tree </header>
+  <pre>
+<span class="esk-paren">(</span>config!
+ <span class="esk-paren">(</span><span class="type">select</span> browser [<span class="constant">:#dirs</span>]<span class="esk-paren">)</span>
+ <span class="constant">:model</span> <span class="esk-paren">(</span>simple-tree-model #<span class="esk-paren">(</span><span class="preprocessor">.isDirectory</span> %<span class="esk-paren">)</span>
+                           #<span class="esk-paren">(</span><span class="builtin">-&gt;&gt;</span> % <span class="preprocessor">.listFiles</span>
+                                 <span class="esk-paren">(</span><span class="variable-name">filter</span> <span class="esk-paren">(</span><span class="variable-name">memfn</span> <span class="preprocessor">isDirectory</span><span class="esk-paren">)))</span>
+                           <span class="esk-paren">(</span><span class="preprocessor">java.io.File.</span> <span class="string">"."</span><span class="esk-paren">)))</span>
+
+  </pre>
+</div>
+
+<div class="slide">
+  <header>seesaw selector </header>
+  <p>
+    Seesaw support folloing css styled selectors:
+  </p>
+
+<ul>
+        <li>Id selector <span> [:#dirs] </span></li>
+        <li>Class selector  <span> [:.classA] </span></li>
+        <li>Type selector
+          <ol>
+            <li>tag, just class name <span>[:tag]</span></li>
+            <li>fully-qualified class,include subclass<span>[:&lt;javax.swing.JLabel&gt;]</span> </li>
+            <li>exact class name<span>[:&lt;javax.swing.JLabel!&gt;]</span> </li>
+          </ol>
+        </li>
+        <li>Universal selector <span>[:*]</span></li>
+        <li>Descendant selectors <span>[:#files :JLabel]</li>
+        <li>Child selectors <span>[:#files :> :JLabel]</li>
+</ul>
+</div>
+
+<div class="slide">
+<header>File name display and icons </header>
+  <pre>
+<span class="esk-paren">(</span>config!
+ <span class="esk-paren">(</span><span class="type">select</span> browser [<span class="constant">:#dirs</span>]<span class="esk-paren">)</span> <span class="constant">:renderer</span>
+ <span class="esk-paren">(</span><span class="variable-name">proxy</span> [<span class="preprocessor">javax.swing.tree.DefaultTreeCellRenderer</span>] []
+   <span class="esk-paren">(</span><span class="preprocessor">getTreeCellRendererComponent</span> [t value s e l r h]
+     <span class="esk-paren">(</span><span class="builtin">do</span>
+       <span class="esk-paren">(</span><span class="variable-name">proxy-super</span> <span class="preprocessor">getTreeCellRendererComponent</span> t value s e l r h<span class="esk-paren">)</span>
+       <span class="esk-paren">(</span><span class="variable-name">proxy-super</span> <span class="preprocessor">setOpenIcon</span> <span class="esk-paren">(</span>icon <span class="esk-paren">(</span>file <span class="string">"icons/open.png"</span><span class="esk-paren">)))</span>
+       <span class="esk-paren">(</span><span class="variable-name">proxy-super</span> <span class="preprocessor">setClosedIcon</span> <span class="esk-paren">(</span>icon <span class="esk-paren">(</span>file <span class="string">"icons/closed.png"</span><span class="esk-paren">)))</span>
+       <span class="esk-paren">(</span><span class="variable-name">proxy-super</span> <span class="preprocessor">setText</span> <span class="esk-paren">(</span><span class="preprocessor">.getName</span> value<span class="esk-paren">)))</span>
+     this<span class="esk-paren">)))</span></pre>
+</div>
+
+<div class="slide">
+<header>List files </header>
+<pre>
+<span class="esk-paren">(</span><span class="variable-name">require</span> '[seesaw.bind <span class="constant">:as</span> b]<span class="esk-paren">)</span>
+<span class="esk-paren">(</span>b/bind
+ <span class="esk-paren">(</span>b/selection <span class="esk-paren">(</span><span class="type">select</span> browser [<span class="constant">:#dirs</span>]<span class="esk-paren">))</span>
+ <span class="esk-paren">(</span>b/transform <span class="esk-paren">(</span><span class="variable-name">fn</span> [files]
+                <span class="esk-paren">(</span><span class="builtin">when</span> <span class="esk-paren">(</span><span class="variable-name">seq</span> files<span class="esk-paren">)</span>
+                  <span class="esk-paren">(</span><span class="builtin">let</span> [current <span class="esk-paren">(</span><span class="variable-name">last</span> files<span class="esk-paren">)</span>]
+                    <span class="esk-paren">(</span><span class="builtin">when</span> <span class="esk-paren">(</span><span class="preprocessor">.isDirectory</span> current<span class="esk-paren">)</span>
+                      <span class="esk-paren">(</span><span class="variable-name">vec</span> <span class="esk-paren">(</span><span class="variable-name">map</span> #<span class="esk-paren">(</span><span class="preprocessor">.getName</span> %<span class="esk-paren">)</span> <span class="esk-paren">(</span><span class="preprocessor">.listFiles</span> current<span class="esk-paren">))))))))</span>
+ <span class="esk-paren">(</span>b/property <span class="esk-paren">(</span><span class="type">select</span> browser [<span class="constant">:#files</span>]<span class="esk-paren">)</span> <span class="constant">:model</span><span class="esk-paren">))</span></pre>
+</div>
+
+<div class="slide">
+  <header>seesaw.bind </header>
+  <p>
+    <br/><br/>
+    <img src="bind.png" alt=""/>
+  </p>
+</div>
+
+<div class="slide">
+  <img src="bind-flow.png" alt=""/>
+</div>
+
+<div class="slide">
+<pre>
+<span class="esk-paren">(</span>config! browser <span class="constant">:content</span>
+               <span class="esk-paren">(</span>left-right-split
+                <span class="esk-paren">(</span>tree <span class="constant">:id</span> <span class="constant">:dirs</span><span class="esk-paren">)</span>
+                <span class="esk-paren">(</span>scrollable <span class="esk-paren">(</span>mig-panel <span class="constant">:id</span> <span class="constant">:files</span>
+                                       <span class="constant">:constraints</span> [<span class="string">"wrap 4"</span> <span class="string">""</span> <span class="string">""</span>]<span class="esk-paren">)</span>
+                            <span class="constant">:hscroll</span> <span class="constant">:never</span><span class="esk-paren">)</span>
+                <span class="constant">:one-touch-expandable?</span> true<span class="esk-paren">))</span></pre>
+</div>
+
+<div class="slide">
+  <header>layout management </header>
+  <img src="layout.png" alt=""/>
+</div>
+
+<div class="slide">
+  <pre>
+<span class="esk-paren">(</span>b/bind
+ <span class="esk-paren">(</span>b/selection <span class="esk-paren">(</span><span class="type">select</span> browser [<span class="constant">:#dirs</span>]<span class="esk-paren">))</span>
+ <span class="esk-paren">(</span>b/transform <span class="esk-paren">(</span><span class="variable-name">fn</span> [files]
+                  <span class="esk-paren">(</span><span class="builtin">when</span> <span class="esk-paren">(</span><span class="variable-name">seq</span> files<span class="esk-paren">)</span>
+                    <span class="esk-paren">(</span><span class="builtin">let</span> [current <span class="esk-paren">(</span><span class="variable-name">last</span> files<span class="esk-paren">)</span>]
+                      <span class="esk-paren">(</span><span class="builtin">when</span> <span class="esk-paren">(</span><span class="preprocessor">.isDirectory</span> current<span class="esk-paren">)</span>
+                        <span class="esk-paren">(</span><span class="variable-name">vec</span> <span class="esk-paren">(</span><span class="preprocessor">.listFiles</span> current<span class="esk-paren">)))))))</span>
+ <span class="esk-paren">(</span>b/b-do* refresh-files-view<span class="esk-paren">))</span>
+  </pre>
+</div>
+
+<div class="slide">
+  <pre>
+<span class="esk-paren">(</span><span class="keyword">defn</span> <span class="function-name">refresh-files-view</span> [files]
+  <span class="esk-paren">(</span><span class="builtin">let</span> [files-pane <span class="esk-paren">(</span><span class="type">select</span> browser [<span class="constant">:#files</span>]<span class="esk-paren">)</span>]
+    <span class="esk-paren">(</span><span class="preprocessor">.removeAll</span> files-pane<span class="esk-paren">)</span>
+    <span class="esk-paren">(</span><span class="builtin">doseq</span> [f files]
+      <span class="esk-paren">(</span><span class="builtin">let</span> [file-icon <span class="esk-paren">(</span><span class="builtin">-&gt;</span> <span class="esk-paren">(</span><span class="builtin">if</span> <span class="esk-paren">(</span><span class="preprocessor">.isDirectory</span> f<span class="esk-paren">)</span>
+                            <span class="string">"icons/folder.png"</span>
+                            <span class="string">"icons/document.png"</span><span class="esk-paren">)</span>
+                          file icon<span class="esk-paren">)</span>
+            file-name <span class="esk-paren">(</span><span class="variable-name">apply</span> str <span class="esk-paren">(</span><span class="variable-name">take</span> 20 <span class="esk-paren">(</span><span class="preprocessor">.getName</span> f<span class="esk-paren">)))</span>]
+        <span class="esk-paren">(</span><span class="preprocessor">.add</span>
+         files-pane
+         <span class="esk-paren">(</span>label <span class="constant">:text</span> file-name
+                <span class="constant">:icon</span>  file-icon
+                <span class="constant">:v-text-position</span> <span class="constant">:bottom</span>
+                <span class="constant">:h-text-position</span>  <span class="constant">:center</span>
+                <span class="constant">:listen</span>
+                [<span class="constant">:mouse-clicked</span>
+                 <span class="esk-paren">(</span><span class="variable-name">fn</span> [e]
+                   <span class="esk-paren">(</span><span class="builtin">if</span> <span class="esk-paren">(</span><span class="builtin">and</span> <span class="esk-paren">(</span><span class="variable-name">=</span> <span class="esk-paren">(</span><span class="preprocessor">.getClickCount</span> e<span class="esk-paren">)</span> 2<span class="esk-paren">)</span>
+                            <span class="esk-paren">(</span><span class="variable-name">not</span> <span class="esk-paren">(</span><span class="preprocessor">.isConsumed</span> e<span class="esk-paren">))</span>
+                            <span class="esk-paren">(</span><span class="preprocessor">.isDirectory</span> f<span class="esk-paren">))</span>
+                     <span class="esk-paren">(</span>refresh-files-view <span class="esk-paren">(</span><span class="preprocessor">.listFiles</span> f<span class="esk-paren">))))</span>]<span class="esk-paren">))))</span>
+    <span class="esk-paren">(</span><span class="builtin">doto</span> files-pane
+      <span class="esk-paren">(</span><span class="preprocessor">.revalidate</span> <span class="esk-paren">)</span>
+      <span class="esk-paren">(</span><span class="preprocessor">.repaint</span><span class="esk-paren">))))</span></pre></div>
+
+<div class="slide">
+  <header> Event handling </header>
+  <p>
+      <ul>
+          <li>Swing event listener is hard to use</li>
+          <li>listen
+            <p>
+              <pre>
+(listen widget 
+        :action (fn [e] ..))
+              </pre>
+            </p>
+          </li>
+          <li>unscribe</li>
+          <li>listen muti events
+            <p>
+                <pre>
+(listen widget
+        #{:clicked :focus} (fn [e] ..))
+                </pre>
+            </p>
+          </li>
+          <li>seesaw.dev/show-events </li>
+      </ul>
+  </p>
+</div>
+
+<div class="slide">
+  <header>File Browser Finally </header>
+  <p>
+<img src="file_browser.png" alt="">
+  </p>
+</div>
+<div class="slide">
+  <header>Pros </header>
+<ul>
+    <li> dsl easier to use </li>
+    <li> selector 
+      <ul>
+          <li>a relax from manually maintaining component relations</li>
+          <li>apply-styelsheet -- declaration style ui programming</li>
+      </ul>
+    </li>
+    <li>  seesaw.bind make event flow clear </li>
+    <li>  Interactive dev </li>
+</ul>
+</div>
+
+<div class="slide">
+  <header>Cons </header>
+<ul>
+    <li>  Swing sucks!
+    </li>
+    <li>  Not quite mature 
+    </li>
+</ul>
+</div>
+
+<div class="slide">
+  <header> Related Resources</header>
+<ul>
+    <li>https://github.com/daveray/seesaw</li>
+    <li>https://groups.google.com/group/seesaw-clj</li>
+    <li>https://gist.github.com/1441520</li>
+    <li>https://github.com/daveray/seesaw/wiki</li>
+    <li>http://blog.darevay.com</li>
+</ul>
+
+</div>
+<div class="slide">
+   <h1>   Q & A   </h1>
+</div>
+</body></html>
